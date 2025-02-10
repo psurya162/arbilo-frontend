@@ -1,0 +1,26 @@
+
+.pair-point-section .pair-point-description{
+    font-size: 2.5rem;
+}
+
+
+
+.custom-font-size {
+    font-size: 2rem;
+}
+
+@media (min-width: 768px) {
+    .home-section .home-title-heading {
+        font-size: 3.5rem; /* Size for md screens and above */
+    }
+    .custom-font-size {
+        font-size: 4rem;
+    }
+
+    /* tips css */
+
+    .tip-section{
+        padding: 0;
+    }
+}
+

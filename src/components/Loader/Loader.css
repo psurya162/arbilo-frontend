@@ -1,0 +1,47 @@
+/* Center the loader on the screen */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f9f9f9; /* Light background for contrast */
+  font-family: 'Poppins', sans-serif; /* Stylish font for branding */
+}
+
+/* Spinner animation */
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 8px solid #e0e0e0; /* Light grey for background */
+  border-top: 8px solid black; /* Arbilo's brand color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Brand name styling */
+.brand-name {
+  margin-top: 15px;
+  font-size: 28px;
+  color: black; /* Same brand color */
+  letter-spacing: 2px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Loading text styling */
+.loading-text {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #555;
+  font-style: italic;
+}

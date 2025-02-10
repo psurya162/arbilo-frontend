@@ -1,0 +1,85 @@
+.announcement-bar {
+    grid-column-gap: 16px;
+    grid-row-gap: 16px;
+    color: #fff;
+    background-color: black;
+    grid-template-rows: auto auto;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-columns: 1fr;
+    align-items: center;
+    font-size: 16px;
+    line-height: 22px;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+.fixed {
+    z-index: 50;
+  }
+  
+  /* Fix for safari mobile */
+  .transform {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+.main-container {
+    width: 100%;
+    max-width: 1272px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 28px;
+    padding-right: 28px;
+}
+.announcement-contents {
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+    position: relative;
+}
+.announcement-text-copy {
+    text-align: center;
+    width: 100%;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+.nav-item {
+    color: #616161;
+    align-items: center;
+    padding: .75rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all .3s;
+    cursor: pointer;
+    position: relative;
+}
+.nav-item::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    display: block;
+    margin-top: 5px;
+    right: 0;
+    background: #000;
+    transition: width .3s ease;
+    -webkit-transition: width .3s ease;
+}
+.nav-item:hover::after {
+    width: 100%;
+    left: 0;
+    background: #000;
+}
+.nav-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color .3s;
+}
+.nav-link:hover {
+    color: #000;
+}
+.nav-item.active {
+    color: #000; /* Change color for active link */
+    font-weight: bold; /* Optional: make the active link bold */
+}

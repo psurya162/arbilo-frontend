@@ -1,0 +1,30 @@
+/* Style the entire ScrollToTop button */
+.scroll-to-top {
+    background-color: black !important; /* Button background */
+    border-radius: 50% !important; /* Make it circular */
+    width: 50px !important;
+    height: 50px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3) !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    animation: upDown 1s infinite alternate ease-in-out;
+  }
+  
+  /* Change the arrow color */
+  .scroll-to-top svg {
+    fill: white !important; /* Arrow color */
+  }
+  
+  /* Animation for up-down movement */
+  @keyframes upDown {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-5px);
+    }
+  }
+  

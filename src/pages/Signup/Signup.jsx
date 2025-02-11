@@ -25,46 +25,43 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Check if all fields are filled
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       toast.error("Please fill in all the fields.");
       return;
     }
-  
+
     // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match.");
       return;
     }
-  
-    // Send signup request
-    toast.promise(
-      axios.post(`${config.API_URL}/api/auth/signup`, formData),
-      {
-        loading: "Signing up...",
-        success: (response) => {
-          navigate("/login"); // Redirect to login page on success
-          return response.data.message; // Display success message
-        },
-        error: (error) => {
-          // Handle specific error cases
-          if (error.response?.status === 400) {
-            if (error.response.data.message === "Email is already registered. Please log in.") {
-              return "Email is already registered. Please log in.";
-            } else if (error.response.data.errors) {
-              // Handle validation errors
-              return error.response.data.errors.map((err) => err.msg).join(", ");
-            } else {
-              return error.response.data.message || "An error occurred during signup.";
-            }
-          } else {
-            return "An error occurred during signup.";
-          }
-        },
+
+    setLoading(true); // Disable button while processing
+
+    try {
+      const response = await axios.post(`${config.API_URL}/api/auth/signup`, formData);
+      toast.success(response.data.message);
+      navigate("/login"); // Redirect to login page on success
+    } catch (error) {
+      if (error.response?.status === 400) {
+        if (error.response.data.message === "Email is already registered. Please log in.") {
+          toast.error("Email is already registered. Please log in.");
+        } else if (error.response.data.errors) {
+          toast.error(error.response.data.errors.map((err) => err.msg).join(", "));
+        } else {
+          toast.error(error.response.data.message || "An error occurred during signup.");
+        }
+      } else {
+        toast.error("An error occurred during signup.");
       }
-    );
+    } finally {
+      setLoading(false); // Enable button again
+    }
   };
+
+  
 
 
   return (
@@ -106,86 +103,87 @@ export default function Signup() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6 mt-8">
-  <fieldset disabled={loading} className="space-y-6">
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-900">Name</label>
-      <input
-        name="name"
-        type="text"
-        value={formData.name}
-        onChange={handleChange}
-        autoComplete="name"
-        className="w-full rounded-lg px-3 py-2 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
-        disabled={loading}
-      />
-    </div>
+              <fieldset disabled={loading} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-900">Name</label>
+                  <input
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    autoComplete="name"
+                    className="w-full rounded-lg px-3 py-2 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
+                    disabled={loading}
+                  />
+                </div>
 
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-900">Email address</label>
-      <input
-        name="email"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        className="w-full rounded-lg px-3 py-2 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
-        disabled={loading}
-      />
-    </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-900">Email address</label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full rounded-lg px-3 py-2 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
+                    disabled={loading}
+                  />
+                </div>
 
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-900">Password</label>
-      <div className="relative">
-        <input
-          name="password"
-          type={showPassword ? "text" : "password"}
-          value={formData.password}
-          onChange={handleChange}
-          autoComplete="new-password"
-          className="w-full rounded-lg px-3 py-2 pr-10 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
-          disabled={loading}
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-        >
-          {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-        </button>
-      </div>
-    </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-900">Password</label>
+                  <div className="relative">
+                    <input
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      autoComplete="new-password"
+                      className="w-full rounded-lg px-3 py-2 pr-10 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                    </button>
+                  </div>
+                </div>
 
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-900">Confirm Password</label>
-      <div className="relative">
-        <input
-          name="confirmPassword"
-          type={showConfirmPassword ? "text" : "password"}
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          className="w-full rounded-lg px-3 py-2 pr-10 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
-          disabled={loading}
-        />
-        <button
-          type="button"
-          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-        >
-          {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-        </button>
-      </div>
-    </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-900">Confirm Password</label>
+                  <div className="relative">
+                    <input
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full rounded-lg px-3 py-2 pr-10 text-gray-900 ring-1 ring-gray-300 focus:ring-2 focus:ring-black"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showConfirmPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+                    </button>
+                  </div>
+                </div>
 
-    <div className="pt-4">
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
-      >
-        {loading ? "Signing up..." : "Sign up"}
-      </button>
-    </div>
-  </fieldset>
-</form>
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-lg bg-black py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+                  >
+                    {loading ? "Signing up..." : "Sign up"}
+                  </button>
+
+                </div>
+              </fieldset>
+            </form>
 
 
             <p className="text-center text-sm text-gray-600">

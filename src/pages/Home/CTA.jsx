@@ -25,6 +25,9 @@ const CTA = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Show pending toast
+    const toastId = toast.loading("Sending your message...");
+
     try {
       // Send POST request to the backend with form data
       const response = await axios.post(`${config.API_URL}/api/auth/contact-us`, formData);
@@ -32,11 +35,11 @@ const CTA = () => {
       // Clear the form fields after successful submission
       setFormData({ name: '', email: '', message: '' });
 
-      // Show success toast using backend message
-      toast.success(response.data.message || 'Message sent successfully!');
+      // Update toast to success
+      toast.success(response.data.message || 'Message sent successfully!', { id: toastId });
     } catch (error) {
-      // Show error toast using backend message if available
-      toast.error(error.response?.data?.message || 'Failed to send the message.');
+      // Update toast to error
+      toast.error(error.response?.data?.message || 'Failed to send the message.', { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -45,7 +48,7 @@ const CTA = () => {
   return (
     <>
       <section className="dark:bg-gray-900">
-        <Toaster/>
+        <Toaster /> {/* Toast container */}
         <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
           <h2 className="mb-4 text-[30px] font-semibold leading-tight text-2xl md:text-4xl text-black text-center">
             Contact Us

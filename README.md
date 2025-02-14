@@ -77,11 +77,6 @@ server {
     root /var/www/html;
     index index.html;
 
-    # SSL Configuration
-    ssl_certificate /etc/letsencrypt/live/arbilo.com/fullchain.pem; # managed Certbot
-    ssl_certificate_key /etc/letsencrypt/live/arbilo.com/privkey.pem; # managby Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
     location / {
         try_files $uri $uri/ /index.html;
@@ -119,10 +114,7 @@ server {
         include fastcgi_params;
     }
 
-    location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))
-        root /usr/share/;
-    }
-}
+    location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|
 
 
     # Additional security headers

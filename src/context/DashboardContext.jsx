@@ -1,8 +1,6 @@
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import config from "@/config.js/config";
 
-const REFRESH_INTERVAL = 300000; // 5 minutes
-
 const DashboardContext = createContext();
 
 export const DashboardProvider = ({ children }) => {
@@ -11,24 +9,39 @@ export const DashboardProvider = ({ children }) => {
         arbiTrackData: [],
         loading: false,
         error: null,
-        countdown: REFRESH_INTERVAL / 1000,
-        lastRefreshTime: null,
+        nextRefreshTime: null,
+        countdown: 0,
         initialized: false
     });
 
-    // Function to get token from localStorage
     const getToken = () => localStorage.getItem("authToken");
+
+    // New function to fetch server time and next refresh
+    const fetchServerStatus = useCallback(async () => {
+        const token = getToken();
+        if (!token) return null;
+
+        try {
+            const response = await fetch(`${config.API_URL}/api/arbitrage/status`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.error("Failed to fetch server status:", error);
+            return null;
+        }
+    }, []);
 
     const fetchArbiPairData = useCallback(async () => {
         const token = getToken();
-        if (!token) {
-            console.warn("Token not found. Skipping ArbiPair fetch.");
-            return [];
-        }
+        if (!token) return [];
 
         try {
             const response = await fetch(`${config.API_URL}/api/arbitrage`, {
-                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
@@ -36,7 +49,6 @@ export const DashboardProvider = ({ children }) => {
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
             const data = await response.json();
             return Array.isArray(data.results) ? data.results : data;
         } catch (error) {
@@ -47,14 +59,10 @@ export const DashboardProvider = ({ children }) => {
 
     const fetchArbiTrackData = useCallback(async () => {
         const token = getToken();
-        if (!token) {
-            console.warn("Token not found. Skipping ArbiTrack fetch.");
-            return [];
-        }
+        if (!token) return [];
 
         try {
             const response = await fetch(`${config.API_URL}/api/arbitrage/arbitrack`, {
-                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
@@ -62,7 +70,6 @@ export const DashboardProvider = ({ children }) => {
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
             const data = await response.json();
 
             if (data && typeof data === "object" && Object.keys(data).length > 0) {
@@ -84,16 +91,17 @@ export const DashboardProvider = ({ children }) => {
 
     const refreshData = useCallback(async (force = false) => {
         const token = getToken();
-        if (!token) {
-            console.warn("Waiting for token...");
-            return;
-        }
+        if (!token) return;
 
         if (state.initialized && !force) return;
 
         setState(prev => ({ ...prev, loading: true, error: null }));
 
         try {
+            // First fetch server status to sync with backend
+            const serverStatus = await fetchServerStatus();
+            if (!serverStatus) throw new Error("Failed to fetch server status");
+
             const [newArbiPairData, newArbiTrackData] = await Promise.all([
                 fetchArbiPairData(),
                 fetchArbiTrackData()
@@ -104,8 +112,8 @@ export const DashboardProvider = ({ children }) => {
                 arbiPairData: newArbiPairData,
                 arbiTrackData: newArbiTrackData,
                 loading: false,
-                lastRefreshTime: Date.now(),
-                countdown: REFRESH_INTERVAL / 1000,
+                nextRefreshTime: serverStatus.nextRefreshTime,
+                countdown: Math.max(0, Math.floor((serverStatus.nextRefreshTime - Date.now()) / 1000)),
                 initialized: true
             }));
         } catch (error) {
@@ -115,44 +123,38 @@ export const DashboardProvider = ({ children }) => {
                 loading: false
             }));
         }
-    }, [fetchArbiPairData, fetchArbiTrackData]);
+    }, [fetchArbiPairData, fetchArbiTrackData, fetchServerStatus]);
 
-    // Check for token before fetching data
+    // Initialize data and sync with server
     useEffect(() => {
-        const interval = setInterval(() => {
+        const initializeData = async () => {
             if (getToken()) {
-                refreshData();
-                clearInterval(interval); // Stop checking once the token is found
+                await refreshData();
             }
-        }, 500);
+        };
 
-        return () => clearInterval(interval);
-    }, []);
-
-    // Auto refresh timer
-    useEffect(() => {
-        if (!state.initialized) {
-            refreshData();
-        }
-
-        const intervalId = setInterval(() => refreshData(true), REFRESH_INTERVAL);
-        return () => clearInterval(intervalId);
+        initializeData();
     }, [refreshData]);
 
-    // Countdown timer
+    // Countdown timer synced with server
     useEffect(() => {
-        if (!state.lastRefreshTime) return;
+        if (!state.nextRefreshTime) return;
 
         const timerId = setInterval(() => {
-            const timeLeft = REFRESH_INTERVAL - (Date.now() - state.lastRefreshTime);
-            setState(prev => ({
-                ...prev,
-                countdown: Math.max(0, Math.floor(timeLeft / 1000))
-            }));
+            const timeLeft = state.nextRefreshTime - Date.now();
+            
+            if (timeLeft <= 0) {
+                refreshData(true);
+            } else {
+                setState(prev => ({
+                    ...prev,
+                    countdown: Math.max(0, Math.floor(timeLeft / 1000))
+                }));
+            }
         }, 1000);
 
         return () => clearInterval(timerId);
-    }, [state.lastRefreshTime]);
+    }, [state.nextRefreshTime, refreshData]);
 
     return (
         <DashboardContext.Provider value={{ state, refreshData }}>

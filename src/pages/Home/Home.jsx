@@ -34,7 +34,7 @@ const Home = () => {
                                         transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
                                     >
                                         <h1 className="home-title-heading font-semibold leading-tight custom-font-size text-black">
-                                            Boost Your Crypto Profits &amp; Like Never Before
+                                            Boost Your Crypto Profitss &amp; Like Never Before
                                             <br />
                                         </h1>
                                     </motion.div>

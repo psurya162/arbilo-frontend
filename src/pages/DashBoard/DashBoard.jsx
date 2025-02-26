@@ -51,15 +51,7 @@ const DashBoard = () => {
     console.log("Navigating to subscription page...");
   };
 
-  // Log for debugging
-  useEffect(() => {
-    console.log("Dashboard State:", {
-      isInitialized,
-      arbiPairDataLength: arbiPairData.length,
-      arbiTrackDataLength: arbiTrackData.length,
-      error,
-    });
-  }, [isInitialized, arbiPairData, arbiTrackData, error]);
+
 
   return (
     <div className="p-2 md:p-4">

@@ -1,7 +1,9 @@
+// DashboardContext.js
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import config from "@/config.js/config";
 
 const REFRESH_INTERVAL = 300000; // 5 minutes
+
 
 const DashboardContext = createContext();
 
@@ -9,7 +11,6 @@ export const DashboardProvider = ({ children }) => {
     const [state, setState] = useState({
         arbiPairData: [],
         arbiTrackData: [],
-        sentimentData: [],
         error: null,
         lastRefreshTime: Date.now(),
         timeUntilNextRefresh: REFRESH_INTERVAL / 1000,
@@ -86,49 +87,20 @@ export const DashboardProvider = ({ children }) => {
         }
     }, []);
 
-    const fetchSentimentData = useCallback(async () => {
-        try {
-            const response = await fetch(`${config.API_URL}/api/crypto/sentiment`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            if (result.success) {
-                return result.data;
-            } else {
-                throw new Error(result.message || 'Failed to fetch sentiment data');
-            }
-        } catch (error) {
-            console.error("Sentiment fetch failed:", error);
-            return [];
-        }
-    }, []);
-
     const refreshData = useCallback(async () => {
         const token = getToken();
-        let sentimentDataResult = [];
-        let arbiPairDataResult = [];
-        let arbiTrackDataResult = [];
-        let errorMessage = null;
+        if (!token) return;
 
         try {
-            // Always fetch sentiment data regardless of token
-            sentimentDataResult = await fetchSentimentData();
-            
-            // Only fetch ArbiPair and ArbiTrack if token exists
-            if (token) {
-                [arbiPairDataResult, arbiTrackDataResult] = await Promise.all([
-                    fetchArbiPairData(),
-                    fetchArbiTrackData()
-                ]);
-            }
+            const [newArbiPairData, newArbiTrackData] = await Promise.all([
+                fetchArbiPairData(),
+                fetchArbiTrackData()
+            ]);
 
             setState(prev => ({
                 ...prev,
-                arbiPairData: arbiPairDataResult,
-                arbiTrackData: arbiTrackDataResult,
-                sentimentData: sentimentDataResult,
+                arbiPairData: newArbiPairData,
+                arbiTrackData: newArbiTrackData,
                 lastRefreshTime: Date.now(),
                 timeUntilNextRefresh: REFRESH_INTERVAL / 1000,
                 error: null,
@@ -137,15 +109,10 @@ export const DashboardProvider = ({ children }) => {
         } catch (error) {
             setState(prev => ({
                 ...prev,
-                error: error.message,
-                // Still update with any partial data we might have received
-                arbiPairData: arbiPairDataResult || prev.arbiPairData,
-                arbiTrackData: arbiTrackDataResult || prev.arbiTrackData,
-                sentimentData: sentimentDataResult || prev.sentimentData,
-                initialized: true
+                error: error.message
             }));
         }
-    }, [fetchArbiPairData, fetchArbiTrackData, fetchSentimentData]);
+    }, [fetchArbiPairData, fetchArbiTrackData]);
 
     // Initial data fetch and refresh interval
     useEffect(() => {
@@ -172,7 +139,6 @@ export const DashboardProvider = ({ children }) => {
     const contextValue = {
         arbiPairData: state.arbiPairData,
         arbiTrackData: state.arbiTrackData,
-        sentimentData: state.sentimentData,
         error: state.error,
         timeUntilNextRefresh: state.timeUntilNextRefresh,
         refreshData,

@@ -110,13 +110,7 @@ const DashBoard = () => {
               <IoMdSwap className="mr-2 group-hover:text-green-600 transition-colors" />
               ArbiPair
             </TabsTrigger>
-            <TabsTrigger
-              value="Sentiments"
-              className="group transition-all duration-300 hover:bg-purple-50"
-            >
-              <FaRegSmile className="mr-2 group-hover:text-purple-600 transition-colors" />
-              Sentiments
-            </TabsTrigger>
+            
           </TabsList>
 
           <TabsContent value="ArbiTrack">

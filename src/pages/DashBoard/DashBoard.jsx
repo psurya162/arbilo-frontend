@@ -5,7 +5,6 @@ import ArbiPair from "./ArbiPair";
 import { IoMdSwap, IoMdTrendingUp } from "react-icons/io";
 import { FaRegSmile } from "react-icons/fa";
 import ArbiTrack from "./ArbiTrack";
-import Sentiments from "./Sentiments";
 import { useDashboard } from "../../context/DashboardContext";
 import { Button } from "@/components/ui/button";
 
@@ -138,9 +137,7 @@ const DashBoard = () => {
             </TabsContent>
           )}
 
-          <TabsContent value="Sentiments">
-            <Sentiments />
-          </TabsContent>
+        
         </Tabs>
       </div>
     </div>

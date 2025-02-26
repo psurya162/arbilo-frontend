@@ -3,7 +3,6 @@ import { AuthContext } from "../../context/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ArbiPair from "./ArbiPair";
 import { IoMdSwap, IoMdTrendingUp } from "react-icons/io";
-import { FaRegSmile } from "react-icons/fa";
 import ArbiTrack from "./ArbiTrack";
 import { useDashboard } from "../../context/DashboardContext";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,6 @@ const DashBoard = () => {
   const [activeTab, setActiveTab] = useState("ArbiTrack");
   const isActive = auth?.user?.is_active;
   const [currentMessage, setCurrentMessage] = useState(messages[0]);
-  const [showMessages, setShowMessages] = useState(!isInitialized);
 
   // Handle loading messages
   useEffect(() => {
@@ -40,7 +38,6 @@ const DashBoard = () => {
       }, 5000);
       return () => clearInterval(interval);
     }
-    setShowMessages(false);
   }, [isInitialized]);
 
   // Format time for display
@@ -54,6 +51,16 @@ const DashBoard = () => {
     console.log("Navigating to subscription page...");
   };
 
+  // Log for debugging
+  useEffect(() => {
+    console.log("Dashboard State:", {
+      isInitialized,
+      arbiPairDataLength: arbiPairData.length,
+      arbiTrackDataLength: arbiTrackData.length,
+      error,
+    });
+  }, [isInitialized, arbiPairData, arbiTrackData, error]);
+
   return (
     <div className="p-2 md:p-4">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center uppercase">
@@ -64,7 +71,7 @@ const DashBoard = () => {
         <div className="text-base md:text-lg font-semibold text-gray-700">
           Next Refresh in: {formatTime(timeUntilNextRefresh)}
         </div>
-        {showMessages && !isInitialized && (
+        {!isInitialized && (
           <p className="text-sm text-gray-500 italic animate-pulse">
             {currentMessage}
           </p>
@@ -93,46 +100,47 @@ const DashBoard = () => {
       )}
 
       <div className="p-2 md:p-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="flex flex-col md:flex-row justify-around mb-4 p-2 md:p-6 gap-2">
-            <TabsTrigger
-              value="ArbiTrack"
-              className="group transition-all duration-300 hover:bg-blue-50"
-            >
-              <IoMdTrendingUp className="mr-2 group-hover:text-blue-600 transition-colors" />
-              ArbiTrack
-            </TabsTrigger>
-            <TabsTrigger
-              value="ArbiPair"
-              disabled={!isActive}
-              className="group transition-all duration-300 hover:bg-green-50 disabled:opacity-50"
-            >
-              <IoMdSwap className="mr-2 group-hover:text-green-600 transition-colors" />
-              ArbiPair
-            </TabsTrigger>
-            
-          </TabsList>
+        {isInitialized ? (
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="flex flex-col md:flex-row justify-around mb-4 p-2 md:p-6 gap-2">
+              <TabsTrigger
+                value="ArbiTrack"
+                className="group transition-all duration-300 hover:bg-blue-50"
+              >
+                <IoMdTrendingUp className="mr-2 group-hover:text-blue-600 transition-colors" />
+                ArbiTrack
+              </TabsTrigger>
+              <TabsTrigger
+                value="ArbiPair"
+                disabled={!isActive}
+                className="group transition-all duration-300 hover:bg-green-50 disabled:opacity-50"
+              >
+                <IoMdSwap className="mr-2 group-hover:text-green-600 transition-colors" />
+                ArbiPair
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="ArbiTrack">
-            <ArbiTrack
-              data={arbiTrackData}
-              loading={!isInitialized}
-              error={error}
-            />
-          </TabsContent>
-
-          {isActive && (
-            <TabsContent value="ArbiPair">
-              <ArbiPair
-                data={arbiPairData}
+            <TabsContent value="ArbiTrack">
+              <ArbiTrack
+                data={arbiTrackData}
                 loading={!isInitialized}
                 error={error}
               />
             </TabsContent>
-          )}
 
-        
-        </Tabs>
+            {isActive && (
+              <TabsContent value="ArbiPair">
+                <ArbiPair
+                  data={arbiPairData}
+                  loading={!isInitialized}
+                  error={error}
+                />
+              </TabsContent>
+            )}
+          </Tabs>
+        ) : (
+          <div className="text-center text-gray-500">Loading dashboard...</div>
+        )}
       </div>
     </div>
   );

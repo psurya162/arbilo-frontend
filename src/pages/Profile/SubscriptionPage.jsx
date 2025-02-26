@@ -75,55 +75,56 @@ const SubscriptionPage = () => {
   }
 
   return (
-    
-      <>
-      
-   
-        
-        <div className="p-6">
-          {/* Grid layout for subscription info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 p-4 rounded shadow-sm">
-              <p className="font-medium text-gray-700">Name:</p>
-              <p className="text-gray-600 uppercase">{subscriptionData.name}</p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded shadow-sm">
-              <p className="font-medium text-gray-700">Email:</p>
-              <p className="text-gray-600 uppercase">{subscriptionData.email}</p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded shadow-sm">
-              <p className="font-medium text-gray-700">Subscription Type:</p>
-              <p className="text-gray-600 uppercase">
-                {subscriptionData.subscription_type || 'Not Subscribed'}
-              </p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded shadow-sm">
-              <p className="font-medium text-gray-700">Subscription Status:</p>
-              <p className="text-gray-600 uppercase">
-                {subscriptionData.subscription_status || 'Inactive'}
-              </p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded shadow-sm">
-              <p className="font-medium text-gray-700">Start Date:</p>
-              <p className="text-gray-600">
-                {subscriptionData.subscription_start_date
-                  ? new Date(subscriptionData.subscription_start_date).toLocaleDateString()
-                  : 'N/A'}
-              </p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded shadow-sm">
-              <p className="font-medium text-gray-700">End Date:</p>
-              <p className="text-gray-600 uppercase">
-                {subscriptionData.subscription_end_date
-                  ? new Date(subscriptionData.subscription_end_date).toLocaleDateString()
-                  : 'N/A'}
-              </p>
-            </div>
+
+    <>
+
+
+
+      <div className="space-y-4">
+        {/* Grid layout for subscription info */}
+        <h2 className="text-base font-semibold text-gray-900">Subscription  Information</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gray-50 p-4 rounded shadow-sm ">
+            <p className="font-medium text-gray-700 ">Name:</p>
+            <p className="text-gray-600 uppercase">{subscriptionData.name}</p>
           </div>
-          
+          <div className="bg-gray-50 p-4 rounded shadow-sm">
+            <p className="font-medium text-gray-700">Email:</p>
+            <p className="text-gray-600 uppercase">{subscriptionData.email}</p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded shadow-sm">
+            <p className="font-medium text-gray-700">Subscription Type:</p>
+            <p className="text-gray-600 uppercase">
+              {subscriptionData.subscription_type || 'Not Subscribed'}
+            </p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded shadow-sm">
+            <p className="font-medium text-gray-700">Subscription Status:</p>
+            <p className="text-gray-600 uppercase">
+              {subscriptionData.subscription_status || 'Inactive'}
+            </p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded shadow-sm">
+            <p className="font-medium text-gray-700">Start Date:</p>
+            <p className="text-gray-600">
+              {subscriptionData.subscription_start_date
+                ? new Date(subscriptionData.subscription_start_date).toLocaleDateString()
+                : 'N/A'}
+            </p>
+          </div>
+          <div className="bg-gray-50 p-4 rounded shadow-sm">
+            <p className="font-medium text-gray-700">End Date:</p>
+            <p className="text-gray-600 uppercase">
+              {subscriptionData.subscription_end_date
+                ? new Date(subscriptionData.subscription_end_date).toLocaleDateString()
+                : 'N/A'}
+            </p>
+          </div>
         </div>
-      
-        </>
+
+      </div>
+
+    </>
   );
 };
 
